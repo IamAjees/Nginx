@@ -1,0 +1,55 @@
+server {
+    listen [::]:443;
+    listen 443 ssl;
+    server_name lakshmimotors.in;
+    #return 301 https://lakshmimotors.in$request_uri;
+    #return 301 $scheme://lakshmimotors.in$request_uri;
+    root /var/www/html/lakshmimotors.in;
+    index index.php index.html index.htm;
+
+    ssl_certificate /etc/ssl/lakshmimotors.in/lakshmimotors.in.crt;
+    ssl_certificate_key /etc/ssl/lakshmimotors.in/lakshmimotors_in.key;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header Strict-Transport-Security max-age=31536000;
+    add_header X-XSS-Protection "1; mode=block";
+    server_tokens off;
+
+    access_log /var/log/nginx/lakshmimotors.in.access.log;
+	
+	error_page 404 = @notfound;
+    location @notfound {
+    return 301 /;
+    }
+
+    location / {
+                # First attempt to serve request as file, then
+                # as directory, then fall back to displaying a 404.
+                try_files $uri $uri/ =404;
+        }
+
+    location ~ \.php$ {
+    include snippets/fastcgi-php.conf;
+    fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+    fastcgi_intercept_errors off;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff2)$ {
+                expires max;
+                log_not_found off;
+    }
+
+    gzip on;
+    gzip_disable "msie6";
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_buffers 16 8k;
+    gzip_http_version 1.1;
+    gzip_types application/javascript application/rss+xml application/vnd.ms-fontobject application/x-font application/x-font-opentype application/x-font-otf application/x-font-truetype application/x-font-ttf application/x-javascript application/xhtml+xml application/xml font/opentype font/otf font/ttf image/svg+xml image/x-icon text/css text/javascript text/plain text/xml;
+	
+}
